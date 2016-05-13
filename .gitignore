@@ -1,8 +1,6 @@
 # User defined ignores
 bin/
 jnative-2.0.3.jar
-.gitignore
-.gitattributes
 
 # Windows image file caches
 Thumbs.db
