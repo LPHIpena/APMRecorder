@@ -1,3 +1,7 @@
+# User defined ignores
+bin/
+jnative-2.0.3.jar
+
 # Windows image file caches
 Thumbs.db
 ehthumbs.db

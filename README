@@ -1,0 +1,6 @@
+APMRecorder is an open source Java application designed to record the count 
+of all key inputs and mouse button events.
+
+Requirements:
+Java se 7
+JNative Hook version 2.0.3
