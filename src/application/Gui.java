@@ -1,10 +1,15 @@
 package application;
 
+import java.util.Map.Entry;
 import java.util.Timer;
 import java.util.TimerTask;
+import java.util.logging.Level;
+import java.util.logging.LogManager;
+import java.util.logging.Logger;
 
 import org.jnativehook.GlobalScreen;
 import org.jnativehook.NativeHookException;
+import org.jnativehook.keyboard.NativeKeyEvent;
 
 import javafx.application.Application;
 import javafx.application.Platform;
@@ -12,7 +17,6 @@ import javafx.geometry.Insets;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.layout.GridPane;
-import javafx.scene.layout.HBox;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
 
@@ -22,9 +26,12 @@ public class Gui extends Application {
 
 	private Button startButton;
 	private Button pauseButton;
+	private Button printButton;
+	private Button resetButton;
+
 	private Button exitButton;
+
 	private Text timerText;
-	private HBox hbox;
 
 	private String timeDisplayString;
 	private long time = 0;
@@ -48,12 +55,9 @@ public class Gui extends Application {
 		// add elements
 		root.add(startButton, 5, 0, 2, 1);
 		root.add(pauseButton, 5, 1, 2, 1);
+		root.add(printButton, 3, 1, 2, 2);
 		root.add(exitButton, 1, 1, 1, 1);
 		root.add(timerText, 2, 1, 1, 1);
-
-		// next line of code is not needed
-		// the style sheet is currently empty.
-		// scene.getStylesheets().add(getClass().getResource("application.css").toExternalForm());
 
 		primaryStage.setScene(scene);
 		primaryStage.show();
@@ -61,7 +65,7 @@ public class Gui extends Application {
 
 	private void initElements(Stage primaryStage) {
 		root = new GridPane();
-		
+
 		// ****************
 		// * Start Button *
 		// ****************
@@ -83,6 +87,25 @@ public class Gui extends Application {
 				e.printStackTrace();
 			}
 		});
+
+		// ****************
+		// * Reset Button *
+		// ****************
+		// TODO: code for reset button goes here
+
+		// ****************
+		// * Print Button *
+		// ****************
+		printButton = new Button("Print Results");
+		printButton.setOnAction((event) -> {
+			for (Entry<Integer, MutableInt> entry : MouseKeyListener.log.entrySet()) {
+				String key = NativeKeyEvent.getKeyText(entry.getKey());
+				MutableInt value = entry.getValue();
+				System.out.println("key, " + key + " value " + value.get());
+			}
+		});
+
+		// TODO: code for reset button goes here
 
 		exitButton = new Button("Exit");
 
@@ -137,6 +160,9 @@ public class Gui extends Application {
 				try {
 
 					GlobalScreen.registerNativeHook();
+					LogManager.getLogManager().reset();
+					Logger logger = Logger.getLogger(GlobalScreen.class.getPackage().getName());
+					logger.setLevel(Level.OFF);
 
 				} catch (NativeHookException e) {
 					System.err.println("There was a problem registering the native hook.");
