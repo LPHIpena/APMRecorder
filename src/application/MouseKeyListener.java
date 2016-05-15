@@ -1,6 +1,7 @@
 package application;
 
 import java.util.HashMap;
+
 import java.util.Map;
 
 import org.jnativehook.GlobalScreen;
@@ -10,25 +11,34 @@ import org.jnativehook.keyboard.NativeKeyListener;
 import org.jnativehook.mouse.NativeMouseEvent;
 import org.jnativehook.mouse.NativeMouseInputListener;
 
+// mutable int class so that we can apply a count to key presses
+// count is saved in the HashMap
+class MutableInt {
+
+	int count = 1;
+
+	public void increment() {
+		++count;
+	}
+
+	public int get() {
+		return count;
+	}
+}
+
+//public class 
+
 public class MouseKeyListener implements NativeKeyListener, NativeMouseInputListener {
 
 	// map to track each time specific key is pressed.
-	Map<String, Integer> log = new HashMap<String, Integer>();
+	public static Map<Integer, MutableInt> log = new HashMap<Integer, MutableInt>();
 
 	// *********************
 	// * Key input events. *
 	// *********************
 	@Override
 	public void nativeKeyPressed(NativeKeyEvent arg0) {
-		// platform.runlater() should be on FX application thread
-		// use Service for thread safety on THIS thread.
-		if (arg0.getKeyCode() == NativeKeyEvent.VC_ESCAPE) {
-			/*try {
-				GlobalScreen.unregisterNativeHook();
-			} catch (NativeHookException e) {
-				e.printStackTrace();
-			}*/
-		}
+		// TODO: code for when CTRL + KEY is pressed
 	}
 
 	@Override
@@ -39,7 +49,17 @@ public class MouseKeyListener implements NativeKeyListener, NativeMouseInputList
 
 	@Override
 	public void nativeKeyTyped(NativeKeyEvent arg0) {
+		// if key is typed we use object->char 
+		// rather than object->int
+		int keyCode = arg0.getKeyChar();
 
+		if (log.get(keyCode) == null) {
+			System.out.println("key: " + keyCode + " is null");
+			log.put(keyCode, new MutableInt());
+		} else {
+			MutableInt count = log.get(keyCode);
+			count.increment();
+		}
 	}
 
 	// ***********************
