@@ -98,7 +98,7 @@ public class Gui extends Application {
 		// ****************
 		printButton = new Button("Print Results");
 		printButton.setOnAction((event) -> {
-			for (Entry<Integer, MutableInt> entry : MouseKeyListener.log.entrySet()) {
+			for (Entry<Character, MutableInt> entry : MouseKeyListener.log.entrySet()) {
 				String key = NativeKeyEvent.getKeyText(entry.getKey());
 				MutableInt value = entry.getValue();
 				System.out.println("key, " + key + " value " + value.get());

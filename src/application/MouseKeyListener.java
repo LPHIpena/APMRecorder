@@ -26,12 +26,21 @@ class MutableInt {
 	}
 }
 
-//public class 
+// enum to track whether to print keyCode or keyChar
+enum MapKeyMode {
+	PRESSED, TYPED
+};
+
+class KeyCode {
+	private MapKeyMode state;
+	private int intCode;
+	private int charCode;
+}
 
 public class MouseKeyListener implements NativeKeyListener, NativeMouseInputListener {
 
 	// map to track each time specific key is pressed.
-	public static Map<Integer, MutableInt> log = new HashMap<Integer, MutableInt>();
+	public static Map<Character, MutableInt> log = new HashMap<Character, MutableInt>();
 
 	// *********************
 	// * Key input events. *
@@ -39,6 +48,15 @@ public class MouseKeyListener implements NativeKeyListener, NativeMouseInputList
 	@Override
 	public void nativeKeyPressed(NativeKeyEvent arg0) {
 		// TODO: code for when CTRL + KEY is pressed
+		char keyCode = arg0.getKeyChar();
+
+		if (log.get(keyCode) == null) {
+			System.out.println("key pressed: " + keyCode + " is null");
+			log.put(keyCode, new MutableInt());
+		} else {
+			MutableInt count = log.get(keyCode);
+			count.increment();
+		}
 	}
 
 	@Override
@@ -49,9 +67,9 @@ public class MouseKeyListener implements NativeKeyListener, NativeMouseInputList
 
 	@Override
 	public void nativeKeyTyped(NativeKeyEvent arg0) {
-		// if key is typed we use object->char 
+		// if key is typed we use object->char
 		// rather than object->int
-		int keyCode = arg0.getKeyChar();
+		char keyCode = arg0.getKeyChar();
 
 		if (log.get(keyCode) == null) {
 			System.out.println("key: " + keyCode + " is null");
