@@ -1,11 +1,8 @@
 package application;
 
 import java.util.HashMap;
-
 import java.util.Map;
 
-import org.jnativehook.GlobalScreen;
-import org.jnativehook.NativeHookException;
 import org.jnativehook.keyboard.NativeKeyEvent;
 import org.jnativehook.keyboard.NativeKeyListener;
 import org.jnativehook.mouse.NativeMouseEvent;
@@ -27,10 +24,18 @@ class MutableInt {
 }
 
 // enum to track whether to print keyCode or keyChar
+// TODO: this is REPLACED by e.getID() 
+// exmaple: 
+// int id = e.getID();
+// if (id == KeyEvent.KEY_TYPED) 
+// https://docs.oracle.com/javase/tutorial/uiswing/events/keylistener.html
 enum MapKeyMode {
 	PRESSED, TYPED
 };
-
+// TODO: might acutally end up using this to track the 
+// TODO: code/char since our map can only accept 1 or the other
+// 		 this will fix that issue. Can hold both in 1 map and print 
+//		 at same the time.. 
 class KeyCode {
 	private MapKeyMode state;
 	private int intCode;
@@ -50,21 +55,20 @@ class KeyCode {
 public class MouseKeyListener implements NativeKeyListener, NativeMouseInputListener {
 
 	// map to track each time specific key is pressed.
-	public static Map<String, MutableInt> log = new HashMap<String, MutableInt>();
+	public static Map<Integer, MutableInt> log = new HashMap<Integer, MutableInt>();
 
 	// *********************
 	// * Key input events. *
 	// *********************
-	@Override
 	public void nativeKeyPressed(NativeKeyEvent arg0) {
 		// TODO: code for when CTRL + KEY is pressed
-		String keyCode = NativeKeyEvent.getKeyText(arg0.getKeyCode());
-
-		if (log.get(keyCode) == null) {
-			System.out.println("key pressed: " + keyCode + " is null");
-			log.put(keyCode, new MutableInt());
+		int key = arg0.getKeyCode(); 
+		System.out.println("Pressed: " + key + ":" + arg0.getRawCode());
+		if (log.get(key) == null) {
+			//System.out.println("key pressed: " + key + " is null");
+			log.put(key, new MutableInt());
 		} else {
-			MutableInt count = log.get(keyCode);
+			MutableInt count = log.get(key);
 			count.increment();
 		}
 	}
@@ -122,5 +126,7 @@ public class MouseKeyListener implements NativeKeyListener, NativeMouseInputList
 		// TODO Auto-generated method stub
 
 	}
+	
+	// TODO: function to add all inputs from map and calculate APM
 
 }
