@@ -24,32 +24,40 @@ class MutableInt {
 }
 
 // enum to track whether to print keyCode or keyChar
-// TODO: this is REPLACED by e.getID() 
-// exmaple: 
-// int id = e.getID();
-// if (id == KeyEvent.KEY_TYPED) 
-// https://docs.oracle.com/javase/tutorial/uiswing/events/keylistener.html
 enum MapKeyMode {
 	PRESSED, TYPED
 };
-// TODO: might acutally end up using this to track the 
-// TODO: code/char since our map can only accept 1 or the other
-// 		 this will fix that issue. Can hold both in 1 map and print 
-//		 at same the time.. 
+
 class KeyCode {
 	private MapKeyMode state;
 	private int intCode;
 	private int charCode;
-	
+
 	// getters
-	public MapKeyMode getMapKeyMode() { return state; }
-	public int getIntCode() { return intCode; }
-	public int getCharCode() { return intCode; }
-	
+	public MapKeyMode getMapKeyMode() {
+		return state;
+	}
+
+	public int getIntCode() {
+		return intCode;
+	}
+
+	public int getCharCode() {
+		return intCode;
+	}
+
 	// setters
-	public void setMapKeyMode(MapKeyMode state) { this.state = state; }
-	public void setIntCode(int code) { intCode = code; }
-	public void setCharCode(int code) { charCode = code; }
+	public void setMapKeyMode(MapKeyMode state) {
+		this.state = state;
+	}
+
+	public void setIntCode(int code) {
+		intCode = code;
+	}
+
+	public void setCharCode(int code) {
+		charCode = code;
+	}
 }
 
 public class MouseKeyListener implements NativeKeyListener, NativeMouseInputListener {
@@ -62,15 +70,25 @@ public class MouseKeyListener implements NativeKeyListener, NativeMouseInputList
 	// *********************
 	public void nativeKeyPressed(NativeKeyEvent arg0) {
 		// TODO: code for when CTRL + KEY is pressed
-		int key = arg0.getKeyCode(); 
+		//loadKeyEventToMap(arg0);
+		/*
+		 * int id = e.getID(); String keyString; if (id == KeyEvent.KEY_TYPED) {
+		 * 
+		 * } else {
+		 * 
+		 * }
+		 */
+
+		int key = arg0.getKeyCode();
 		System.out.println("Pressed: " + key + ":" + arg0.getRawCode());
 		if (log.get(key) == null) {
-			//System.out.println("key pressed: " + key + " is null");
+			// System.out.println("key pressed: " + key + " is null");
 			log.put(key, new MutableInt());
 		} else {
 			MutableInt count = log.get(key);
 			count.increment();
 		}
+
 	}
 
 	@Override
@@ -83,15 +101,26 @@ public class MouseKeyListener implements NativeKeyListener, NativeMouseInputList
 	public void nativeKeyTyped(NativeKeyEvent arg0) {
 		// if key is typed we use object->char
 		// rather than object->int
-		/*String keyCode = NativeKeyEvent.getKeyText(arg0.getKeyCode());
+		/*
+		 * String keyCode = NativeKeyEvent.getKeyText(arg0.getKeyCode());
+		 * 
+		 * if (log.get(keyCode) == null) { System.out.println("key: " + keyCode
+		 * + " is null"); log.put(keyCode, new MutableInt()); } else {
+		 * MutableInt count = log.get(keyCode); count.increment(); }
+		 */
+	}
 
-		if (log.get(keyCode) == null) {
-			System.out.println("key: " + keyCode + " is null");
-			log.put(keyCode, new MutableInt());
+	private void loadKeyEventToMap(NativeKeyEvent e) {
+		int id = e.getID();
+		String keyString;
+		if (id == NativeKeyEvent.NATIVE_KEY_TYPED) {
+			char c = e.getKeyChar();
+			keyString = "key character = '" + c + "'";
 		} else {
-			MutableInt count = log.get(keyCode);
-			count.increment();
-		}*/
+			int keyCode = e.getKeyCode();
+			keyString = "key code = " + keyCode + "(" + NativeKeyEvent.getKeyText(keyCode) + ")";
+		}
+
 	}
 
 	// ***********************
@@ -126,7 +155,7 @@ public class MouseKeyListener implements NativeKeyListener, NativeMouseInputList
 		// TODO Auto-generated method stub
 
 	}
-	
+
 	// TODO: function to add all inputs from map and calculate APM
 
 }
