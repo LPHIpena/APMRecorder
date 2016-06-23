@@ -10,6 +10,7 @@ import java.util.logging.Logger;
 import org.jnativehook.GlobalScreen;
 import org.jnativehook.NativeHookException;
 import org.jnativehook.keyboard.NativeKeyEvent;
+import org.jnativehook.mouse.NativeMouseEvent;
 
 import javafx.application.Application;
 import javafx.application.Platform;
@@ -36,6 +37,9 @@ public class Gui extends Application {
 	private String timeDisplayString;
 	private long time = 0;
 	private Timer timer = new Timer();
+	
+	private MouseKeyListener mouseKeyListener;
+	private boolean isListenerAdded = false;
 
 	@Override
 	public void start(Stage primaryStage) throws Exception {
@@ -82,6 +86,9 @@ public class Gui extends Application {
 		pauseButton.setOnAction((event) -> {
 			try {
 				GlobalScreen.unregisterNativeHook();
+				GlobalScreen.removeNativeKeyListener(mouseKeyListener);
+				GlobalScreen.removeNativeMouseListener(mouseKeyListener);
+				isListenerAdded = false;
 				pause();
 			} catch (Exception e) {
 				e.printStackTrace();
@@ -91,23 +98,33 @@ public class Gui extends Application {
 		// ****************
 		// * Reset Button *
 		// ****************
-		// TODO: code for reset button goes here
+		resetButton = new Button("Reset");
+		resetButton.setOnAction((event) -> {
+			// TODO: code for reset button
+			// need to reset clear map of all values
+			// reset and reset time
+		});
 
 		// ****************
 		// * Print Button *
 		// ****************
 		printButton = new Button("Print Results");
 		printButton.setOnAction((event) -> {
-			for (Entry<Character, MutableInt> entry : MouseKeyListener.log.entrySet()) {
-				String key = NativeKeyEvent.getKeyText(entry.getKey());
+			for (Entry<Integer, MutableInt> entry : MouseKeyListener.log.entrySet()) {
+				int key = entry.getKey();
+
 				MutableInt value = entry.getValue();
-				System.out.println("key, " + key + " value " + value.get());
+				System.out.println("key, " + NativeKeyEvent.getKeyText(key) + " value " + value.get());
 			}
+			
+			System.out.println("click count " + MouseKeyListener.mouseClickCount);
 		});
 
-		// TODO: code for reset button goes here
-
+		// ***************
+		// * Exit Button *
+		// ***************
 		exitButton = new Button("Exit");
+		exitButton.setOnAction(actionEvent -> Platform.exit());
 
 		// Text to display timer
 		timerText = new Text("00:00");
@@ -130,27 +147,16 @@ public class Gui extends Application {
 	}
 
 	private void pause() {
-		this.timer.cancel();
+		timer.cancel();
 	}
 
 	private void start() {
-		this.timer = new Timer();
+		timer = new Timer();
 		timer.scheduleAtFixedRate(new TimingTask(), 0, 1);
 	}
 
 	private void resetTime() {
-		this.time = 0;
-	}
-
-	private void timer() {
-		/*
-		 * timer.scheduleAtFixedRate(new TimerTask() { public void run() {
-		 * Platform.runLater(new Runnable() {
-		 * 
-		 * @Override public void run() { // Long.toString(time++)) time++;
-		 * timeDisplayString = String.format("%02d:%02d", time / 60000, time /
-		 * 1000); timerText.setText(timeDisplayString); } }); } }, 0, 1);
-		 */
+		time = 0;
 	}
 
 	private void startKeyListener() {
@@ -160,6 +166,8 @@ public class Gui extends Application {
 				try {
 
 					GlobalScreen.registerNativeHook();
+					
+					// disable JNative logging.
 					LogManager.getLogManager().reset();
 					Logger logger = Logger.getLogger(GlobalScreen.class.getPackage().getName());
 					logger.setLevel(Level.OFF);
@@ -170,8 +178,13 @@ public class Gui extends Application {
 
 					System.exit(1);
 				}
-
-				GlobalScreen.addNativeKeyListener(new MouseKeyListener());
+				mouseKeyListener = MouseKeyListener.getInstance(); 
+				if (!isListenerAdded) {
+					GlobalScreen.addNativeKeyListener(mouseKeyListener);
+					GlobalScreen.addNativeMouseListener(mouseKeyListener);
+					isListenerAdded = true;
+				}
+				
 			}
 
 		}).start();
