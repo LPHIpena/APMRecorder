@@ -10,13 +10,13 @@ import java.util.logging.Logger;
 import org.jnativehook.GlobalScreen;
 import org.jnativehook.NativeHookException;
 import org.jnativehook.keyboard.NativeKeyEvent;
-import org.jnativehook.mouse.NativeMouseEvent;
 
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.geometry.Insets;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
+import javafx.scene.control.ToggleButton;
 import javafx.scene.layout.GridPane;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
@@ -26,7 +26,7 @@ public class Gui extends Application {
 	private GridPane root;
 
 	private Button startButton;
-	private Button pauseButton;
+	private ToggleButton pauseButton;
 	private Button printButton;
 	private Button resetButton;
 
@@ -82,7 +82,7 @@ public class Gui extends Application {
 		// ****************
 		// * Pause Button *
 		// ****************
-		pauseButton = new Button("Pause Recording");
+		pauseButton = new ToggleButton("Pause Recording");
 		pauseButton.setOnAction((event) -> {
 			try {
 				GlobalScreen.unregisterNativeHook();
@@ -158,7 +158,7 @@ public class Gui extends Application {
 	private void resetTime() {
 		time = 0;
 	}
-
+	
 	private void startKeyListener() {
 		new Thread(new Runnable() {
 			@Override
