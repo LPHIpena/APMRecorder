@@ -13,6 +13,8 @@ import org.jnativehook.keyboard.NativeKeyEvent;
 
 import javafx.application.Application;
 import javafx.application.Platform;
+import javafx.beans.binding.Bindings;
+import javafx.beans.value.ObservableBooleanValue;
 import javafx.geometry.Insets;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
@@ -36,7 +38,7 @@ public class Gui extends Application {
 
 	private String timeDisplayString;
 	private long time = 0;
-	private Timer timer = new Timer();
+	private Timer timer;
 	
 	private MouseKeyListener mouseKeyListener;
 	private boolean isListenerAdded = false;
@@ -67,69 +69,7 @@ public class Gui extends Application {
 		primaryStage.show();
 	}
 
-	private void initElements(Stage primaryStage) {
-		root = new GridPane();
 
-		// ****************
-		// * Start Button *
-		// ****************
-		startButton = new Button("Start/Resume");
-		startButton.setOnAction((event) -> {
-			startKeyListener();
-			start();
-		});
-
-		// ****************
-		// * Pause Button *
-		// ****************
-		pauseButton = new ToggleButton("Pause Recording");
-		pauseButton.setOnAction((event) -> {
-			try {
-				GlobalScreen.unregisterNativeHook();
-				GlobalScreen.removeNativeKeyListener(mouseKeyListener);
-				GlobalScreen.removeNativeMouseListener(mouseKeyListener);
-				isListenerAdded = false;
-				pause();
-			} catch (Exception e) {
-				e.printStackTrace();
-			}
-		});
-
-		// ****************
-		// * Reset Button *
-		// ****************
-		resetButton = new Button("Reset");
-		resetButton.setOnAction((event) -> {
-			// TODO: code for reset button
-			// need to reset clear map of all values
-			// reset and reset time
-		});
-
-		// ****************
-		// * Print Button *
-		// ****************
-		printButton = new Button("Print Results");
-		printButton.setOnAction((event) -> {
-			for (Entry<Integer, MutableInt> entry : MouseKeyListener.log.entrySet()) {
-				int key = entry.getKey();
-
-				MutableInt value = entry.getValue();
-				System.out.println("key, " + NativeKeyEvent.getKeyText(key) + " value " + value.get());
-			}
-			
-			System.out.println("click count " + MouseKeyListener.mouseClickCount);
-		});
-
-		// ***************
-		// * Exit Button *
-		// ***************
-		exitButton = new Button("Exit");
-		exitButton.setOnAction(actionEvent -> Platform.exit());
-
-		// Text to display timer
-		timerText = new Text("00:00");
-
-	}
 
 	public class TimingTask extends TimerTask {
 		@Override
@@ -151,8 +91,11 @@ public class Gui extends Application {
 	}
 
 	private void start() {
-		timer = new Timer();
-		timer.scheduleAtFixedRate(new TimingTask(), 0, 1);
+		if(timer == null) {
+			timer = new Timer();
+			timer.scheduleAtFixedRate(new TimingTask(), 0, 1); 
+		}
+		
 	}
 
 	private void resetTime() {
@@ -190,12 +133,82 @@ public class Gui extends Application {
 		}).start();
 
 	}
+	
+	private void printEventCount() {
+		for (Entry<Integer, MutableInt> entry : MouseKeyListener.log.entrySet()) {
+			int key = entry.getKey();
+
+			MutableInt value = entry.getValue();
+			System.out.println("key, " + NativeKeyEvent.getKeyText(key) + " value " + value.get());
+		}
+		
+		System.out.println("click count " + MouseKeyListener.mouseClickCount);
+	}
+	
+	private void initElements(Stage primaryStage) {
+		root = new GridPane();
+
+		// ****************
+		// * Start Button *
+		// ****************
+		startButton = new Button("Start/Resume");
+		startButton.setOnAction((event) -> {
+			startKeyListener();
+			start();
+		});
+
+		// ****************
+		// * Pause Button *
+		// ****************
+		pauseButton = new ToggleButton("Pause Recording");
+		boolean isStartDisabled = startButton.isDisabled();
+		pauseButton.setDisable(isStartDisabled);
+		pauseButton.setOnAction((event) -> {
+			try {
+				GlobalScreen.unregisterNativeHook();
+				GlobalScreen.removeNativeKeyListener(mouseKeyListener);
+				GlobalScreen.removeNativeMouseListener(mouseKeyListener);
+				isListenerAdded = false;
+				pause();
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		});
+
+		// ****************
+		// * Reset Button *
+		// ****************
+		resetButton = new Button("Reset");
+		resetButton.setOnAction((event) -> {
+			// TODO: code for reset button
+			// need to reset clear map of all values
+			// reset and reset time
+		});
+
+		// ****************
+		// * Print Button *
+		// ****************
+		printButton = new Button("Print Results");
+		printButton.setOnAction((event) -> {
+			 printEventCount();
+		});
+
+		// ***************
+		// * Exit Button *
+		// ***************
+		exitButton = new Button("Exit");
+		exitButton.setOnAction(actionEvent -> Platform.exit());
+
+		// Text to display timer
+		timerText = new Text("00:00");
+
+	}
 
 	public static void main(String[] args) throws NativeHookException {
 		launch(args);
 		GlobalScreen.unregisterNativeHook();
 
 		if (!GlobalScreen.isNativeHookRegistered())
-			System.out.println("it's done hoe");
+			System.out.println("it's done");
 	}
 }
