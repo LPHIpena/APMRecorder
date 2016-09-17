@@ -79,7 +79,7 @@ public class Gui extends Application {
 				public void run() {
 					// Long.toString(time++))
 					time++;
-					timeDisplayString = String.format("%02d:%02d", time / 60000, time / 1000);
+					timeDisplayString = String.format("%02d:%02d", time / 60000, time / 600);
 					timerText.setText(timeDisplayString);
 				}
 			});
@@ -96,6 +96,20 @@ public class Gui extends Application {
 			timer.scheduleAtFixedRate(new TimingTask(), 0, 1); 
 		}
 		
+	}
+	
+	private void exit() {
+		try {
+			if(isListenerAdded) {
+				GlobalScreen.unregisterNativeHook();
+				GlobalScreen.removeNativeKeyListener(mouseKeyListener);
+				GlobalScreen.removeNativeMouseListener(mouseKeyListener);
+			}
+		}
+		catch (Exception e) {
+				System.err.println("There was a problem unregistering the native hook.");
+				System.err.println(e.getMessage());
+		}
 	}
 
 	private void resetTime() {
@@ -197,7 +211,13 @@ public class Gui extends Application {
 		// * Exit Button *
 		// ***************
 		exitButton = new Button("Exit");
-		exitButton.setOnAction(actionEvent -> Platform.exit());
+		exitButton.setOnAction((event) -> {
+			exit();
+			Platform.exit();
+			//actionEvent -> Platform.exit();
+
+		});
+		//actionEvent -> Platform.exit());
 
 		// Text to display timer
 		timerText = new Text("00:00");
