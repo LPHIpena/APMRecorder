@@ -149,6 +149,7 @@ public class Gui extends Application {
 	}
 	
 	private void printEventCount() {
+		System.out.print("\n\n\n\n");
 		for (Entry<Integer, MutableInt> entry : MouseKeyListener.log.entrySet()) {
 			int key = entry.getKey();
 
